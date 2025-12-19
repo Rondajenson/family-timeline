@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Timeline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.025em;
+        }
+
+        .header p {
+            color: #cbd5e1;
+            font-size: 1.125rem;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 3rem;
+        }
+
+        .filter-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .filter-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .filter-btn.active {
+            background: white;
+            color: #0f172a;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-btn:not(.active) {
+            background: #334155;
+            color: #e2e8f0;
+        }
+
+        .filter-btn:not(.active):hover {
+            background: #475569;
+        }
+
+        .timeline-container {
+            position: relative;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, #3b82f6, #ec4899, #a855f7);
+            opacity: 0.3;
+            border-radius: 9999px;
+        }
+
+        .timeline-events {
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+        }
+
+        .event {
+            position: relative;
+        }
+
+        .event-dot {
+            position: absolute;
+            left: 50%;
+            top: -0.5rem;
+            transform: translateX(-50%);
+            z-index: 10;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            border: 4px solid #0f172a;
+            font-size: 1.5rem;
+        }
+
+        .event-content {
+            display: flex;
+            align-items: center;
+        }
+
+        .event-card {
+            width: 45%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .event:nth-child(even) .event-content {
+            justify-content: flex-end;
+        }
+
+        .event:nth-child(odd) .event-content {
+            justify-content: flex-start;
+        }
+
+        .event:nth-child(even) .event-card {
+            margin-left: auto;
+        }
+
+        .event:nth-child(odd) .event-card {
+            margin-right: auto;
+        }
+
+        .event-card:hover {
+            transform: scale(1.05);
+        }
+
+        .card-inner {
+            background: #1e293b;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+            transition: all 0.3s;
+        }
+
+        .event-card:hover .card-inner {
+            border-color: #475569;
+        }
+
+        .card-inner.selected {
+            border: 4px solid white;
+        }
+
+        .event-image {
+            position: relative;
+            height: 12rem;
+            overflow: hidden;
+        }
+
+        .event-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .event-category-badge {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .event-details {
+            padding: 1.25rem;
+        }
+
+        .event-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-date {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #cbd5e1;
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .event-description {
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+
+        .event-lifespan {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #334155;
+        }
+
+        .event-lifespan span {
+            color: #64748b;
+            font-size: 0.75rem;
+        }
+
+        .legend {
+            margin-top: 4rem;
+            padding: 1.5rem;
+            background: #1e293b;
+            border-radius: 1rem;
+            border: 1px solid #334155;
+        }
+
+        .legend h3 {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-icon {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .legend-text {
+            color: #cbd5e1;
+            font-size: 0.875rem;
+        }
+
+        .instructions {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(30, 58, 138, 0.3);
+            border: 1px solid #3b82f6;
+            border-radius: 0.75rem;
+        }
+
+        .instructions h3 {
+            color: white;
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+        }
+
+        .instructions-content {
+            color: #bfdbfe;
+            font-size: 0.875rem;
+        }
+
+        .instructions-content p {
+            margin-bottom: 0.5rem;
+        }
+
+        .instructions-content ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .instructions-content li {
+            margin-bottom: 0.25rem;
+        }
+
+        /* Category colors */
+        .cat-lifeline { background: #3b82f6; }
+        .cat-wedding { background: #ec4899; }
+        .cat-birthday { background: #a855f7; }
+        .cat-cars { background: #10b981; }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .event-card {
+                width: 100%;
+            }
+
+            .event:nth-child(even) .event-content,
+            .event:nth-child(odd) .event-content {
+                justify-content: center;
+            }
+
+            .timeline-line {
+                left: 1rem;
+            }
+
+            .event-dot {
+                left: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Family Timeline</h1>
+            <p>A journey through our cherished moments</p>
+        </div>
+
+        <div class="filters" id="filters"></div>
+
+        <div class="timeline-container">
+            <div class="timeline-line"></div>
+            <div class="timeline-events" id="timeline"></div>
+        </div>
+
+        <div class="legend">
+            <h3>Event Categories</h3>
+            <div class="legend-items" id="legend"></div>
+        </div>
+
+        <div class="instructions">
+            <h3>📝 How to Add New Events</h3>
+            <div class="instructions-content">
+                <p><strong>To add events:</strong> Edit the events array in the JavaScript section below.</p>
+                <ul>
+                    <li>startDate: Event date (YYYY-MM-DD format)</li>
+                    <li>endDate: End date (use startDate for single events)</li>
+                    <li>title: Event name</li>
+                    <li>category: Life Line, Wedding, Birthday, or Cars</li>
+                    <li>description: Optional details</li>
+                    <li>image: URL to photo</li>
+                </ul>
+                <p style="margin-top: 0.75rem;"><strong>Tips:</strong> Use public image URLs from Google Drive, Imgur, or similar services.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Your event data - EDIT THIS SECTION TO ADD/MODIFY EVENTS
+        const events = [
+            {
+                id: 1,
+                startDate: '1931-05-15',
+                endDate: '2013-01-17',
+                title: 'The Life of Arlean',
+                category: 'Life Line',
+                description: '',
+                image: 'https://github.com/Rondajenson/family-timeline/blob/images/arlean.jpg?raw=true'
+            },
+            {
+                id: 2,
+                startDate: '1931-08-10',
+                endDate: '2022-03-23',
+                title: 'The Life of Donn',
+                category: 'Life Line',
+                description: '',
+                image: 'https://drive.google.com/uc?export=view&id=1VoBFUG0NoCZAeRQdjKOrKEXGogRkDinC'
+            },
+            {
+                id: 3,
+                startDate: '1956-07-19',
+                endDate: '2021-06-11',
+                title: 'The Life of Laura',
+                category: 'Life Line',
+                description: '',
+                image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400'
+            },
+            {
+                id: 4,
+                startDate: '1954-12-30',
+                endDate: '1954-12-30',
+                title: 'Donn and Arlean Get Married',
+                category: 'Wedding',
+                description: 'Des Moines, Iowa',
+                image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400'
+            },
+            {
+                id: 5,
+                startDate: '1991-05-04',
+                endDate: '1991-05-04',
+                title: 'Miles and Ronda Wedding',
+                category: 'Wedding',
+                description: 'Married in Horton Kansas',
+                image: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400'
+            },
+            {
+                id: 6,
+                startDate: '1995-05-02',
+                endDate: '1995-05-02',
+                title: 'Anna Born',
+                category: 'Birthday',
+                description: 'Born in Kansas City, Missouri',
+                image: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400'
+            },
+            {
+                id: 7,
+                startDate: '1998-12-08',
+                endDate: '1998-12-08',
+                title: 'Caroline Born',
+                category: 'Birthday',
+                description: 'Born in Kansas City, Missouri',
+                image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400'
+            },
+            {
+                id: 8,
+                startDate: '2024-08-30',
+                endDate: '2024-08-30',
+                title: 'Anna and Jacob Get Married',
+                category: 'Wedding',
+                description: 'Powell Gardens, Missouri',
+                image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400'
+            },
+            {
+                id: 9,
+                startDate: '2002-04-12',
+                endDate: '2002-04-12',
+                title: 'Mazda Van',
+                category: 'Cars',
+                description: '',
+                image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=400'
+            }
+        ];
+
+        const categories = ['All', 'Life Line', 'Wedding', 'Birthday', 'Cars'];
+        
+        const categoryConfig = {
+            'Life Line': { 
+                color: 'cat-lifeline', 
+                icon: '👥',
+                bgColor: '#3b82f6'
+            },
+            'Wedding': { 
+                color: 'cat-wedding', 
+                icon: '💕',
+                bgColor: '#ec4899'
+            },
+            'Birthday': { 
+                color: 'cat-birthday', 
+                icon: '🎂',
+                bgColor: '#a855f7'
+            },
+            'Cars': { 
+                color: 'cat-cars', 
+                icon: '🚗',
+                bgColor: '#10b981'
+            }
+        };
+
+        let selectedCategory = 'All';
+        let selectedEvent = null;
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        function getDateRange(start, end) {
+            if (start === end) return formatDate(start);
+            return `${formatDate(start)} - ${formatDate(end)}`;
+        }
+
+        function calculateYears(start, end) {
+            const startDate = new Date(start);
+            const endDate = new Date(end);
+            return endDate.getFullYear() - startDate.getFullYear();
+        }
+
+        function renderFilters() {
+            const filtersEl = document.getElementById('filters');
+            filtersEl.innerHTML = categories.map(cat => `
+                <button class="filter-btn ${cat === selectedCategory ? 'active' : ''}" 
+                        onclick="filterCategory('${cat}')">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function renderTimeline() {
+            const timelineEl = document.getElementById('timeline');
+            const filteredEvents = selectedCategory === 'All' 
+                ? events 
+                : events.filter(e => e.category === selectedCategory);
+            
+            const sortedEvents = [...filteredEvents].sort((a, b) => 
+                new Date(a.startDate) - new Date(b.startDate)
+            );
+
+            timelineEl.innerHTML = sortedEvents.map(event => {
+                const config = categoryConfig[event.category];
+                const isLifeLine = event.category === 'Life Line';
+                const years = isLifeLine ? calculateYears(event.startDate, event.endDate) : null;
+                const isSelected = event.id === selectedEvent;
+
+                return `
+                    <div class="event">
+                        <div class="event-dot ${config.color}">
+                            ${config.icon}
+                        </div>
+                        <div class="event-content">
+                            <div class="event-card" onclick="selectEvent(${event.id})">
+                                <div class="card-inner ${isSelected ? 'selected' : ''}">
+                                    <div class="event-image">
+                                        <img src="${event.image}" 
+                                             alt="${event.title}"
+                                             onerror="this.src='https://images.unsplash.com/photo-1464618663641-bbdd760ae84a?w=400'">
+                                        <div class="event-category-badge ${config.color}">
+                                            ${event.category}
+                                        </div>
+                                    </div>
+                                    <div class="event-details">
+                                        <h3 class="event-title">${event.title}</h3>
+                                        <div class="event-date">
+                                            📅
+                                            <span>${getDateRange(event.startDate, event.endDate)}</span>
+                                        </div>
+                                        ${event.description ? `
+                                            <p class="event-description">${event.description}</p>
+                                        ` : ''}
+                                        ${isLifeLine ? `
+                                            <div class="event-lifespan">
+                                                <span>${years} years</span>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderLegend() {
+            const legendEl = document.getElementById('legend');
+            legendEl.innerHTML = Object.entries(categoryConfig).map(([cat, config]) => `
+                <div class="legend-item">
+                    <div class="legend-icon ${config.color}">
+                        ${config.icon}
+                    </div>
+                    <span class="legend-text">${cat}</span>
+                </div>
+            `).join('');
+        }
+
+        function filterCategory(category) {
+            selectedCategory = category;
+            selectedEvent = null;
+            renderFilters();
+            renderTimeline();
+        }
+
+        function selectEvent(eventId) {
+            selectedEvent = selectedEvent === eventId ? null : eventId;
+            renderTimeline();
+        }
+
+        // Initialize when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            renderFilters();
+            renderTimeline();
+            renderLegend();
+        });
+    </script>
+</body>
+</html>
