@@ -1,88 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Family Timeline</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a);
             min-height: 100vh;
             overflow-x: hidden;
+            color: #e2e8f0;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
 
-        .header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .header h1 {
-            font-size: 3rem;
-            font-weight: bold;
-            color: white;
-            margin-bottom: 0.75rem;
-            letter-spacing: -0.025em;
-        }
-
-        .header p {
-            color: #cbd5e1;
-            font-size: 1.125rem;
-        }
+        .header { text-align: center; margin-bottom: 2rem; }
+        .header h1 { font-size: 2.5rem; font-weight: 700; color: white; margin-bottom: 0.5rem; }
+        .header p { color: #cbd5e1; }
 
         .filters {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 0.75rem;
-            margin-bottom: 3rem;
+            margin-bottom: 1.5rem;
         }
 
         .filter-btn {
-            padding: 0.75rem 1.5rem;
+            padding: 0.6rem 1.2rem;
             border-radius: 9999px;
             font-weight: 600;
             border: none;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             font-size: 0.95rem;
-        }
-
-        .filter-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .filter-btn.active {
-            background: white;
-            color: #0f172a;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        .filter-btn:not(.active) {
             background: #334155;
             color: #e2e8f0;
         }
 
-        .filter-btn:not(.active):hover {
-            background: #475569;
-        }
+        .filter-btn:hover { transform: translateY(-3px); }
+        .filter-btn.active { background: white; color: #0f172a; box-shadow: 0 10px 15px -5px rgba(0,0,0,0.1); }
 
-        .timeline-container {
-            position: relative;
-        }
-
+        .timeline-container { position: relative; padding-top: 1rem; }
         .timeline-line {
             position: absolute;
             left: 50%;
@@ -97,17 +59,17 @@
         .timeline-events {
             display: flex;
             flex-direction: column;
-            gap: 3rem;
+            gap: 2.5rem;
+            position: relative;
+            padding-bottom: 2rem;
         }
 
-        .event {
-            position: relative;
-        }
+        .event { position: relative; }
 
         .event-dot {
             position: absolute;
             left: 50%;
-            top: -0.5rem;
+            top: -0.75rem;
             transform: translateX(-50%);
             z-index: 10;
             width: 3rem;
@@ -116,221 +78,80 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
             border: 4px solid #0f172a;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
+            color: white;
         }
 
-        .event-content {
-            display: flex;
-            align-items: center;
-        }
+        .event-content { display: flex; align-items: center; }
+        .event-card { width: 45%; cursor: pointer; transition: all 0.25s; }
 
-        .event-card {
-            width: 45%;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .event:nth-child(even) .event-content {
-            justify-content: flex-end;
-        }
-
-        .event:nth-child(odd) .event-content {
-            justify-content: flex-start;
-        }
-
-        .event:nth-child(even) .event-card {
-            margin-left: auto;
-        }
-
-        .event:nth-child(odd) .event-card {
-            margin-right: auto;
-        }
-
-        .event-card:hover {
-            transform: scale(1.05);
-        }
+        .event:nth-child(even) .event-content { justify-content: flex-end; }
+        .event:nth-child(odd) .event-content { justify-content: flex-start; }
+        .event:nth-child(even) .event-card { margin-left: auto; }
+        .event:nth-child(odd) .event-card { margin-right: auto; }
 
         .card-inner {
-            background: #1e293b;
+            background: #0f172a;
             border-radius: 1rem;
             overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.6);
             border: 1px solid #334155;
-            transition: all 0.3s;
+            transition: transform 0.2s, border-color 0.2s;
         }
 
-        .event-card:hover .card-inner {
-            border-color: #475569;
-        }
+        .event-card:hover .card-inner { transform: translateY(-6px); border-color: #475569; }
+        .card-inner.selected { border: 4px solid white; }
 
-        .card-inner.selected {
-            border: 4px solid white;
-        }
-
-        .event-image {
-            position: relative;
-            height: 12rem;
-            overflow: hidden;
-        }
-
-        .event-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .event-image { position: relative; height: 10rem; overflow: hidden; background: #0b1220; }
+        .event-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
         .event-category-badge {
             position: absolute;
-            top: 0.75rem;
-            right: 0.75rem;
+            top: 0.5rem;
+            right: 0.5rem;
             padding: 0.25rem 0.75rem;
             border-radius: 9999px;
             font-size: 0.75rem;
             font-weight: 600;
             color: white;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
         }
 
-        .event-details {
-            padding: 1.25rem;
-        }
+        .event-details { padding: 1rem; }
+        .event-title { font-size: 1.05rem; font-weight: 700; color: white; margin-bottom: 0.35rem; }
+        .event-date { display:flex; align-items:center; gap:0.5rem; color: #cbd5e1; font-size: 0.85rem; margin-bottom: 0.5rem; }
+        .event-description { color: #94a3b8; font-size: 0.9rem; }
 
-        .event-title {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: white;
-            margin-bottom: 0.5rem;
-        }
+        .event-lifespan { margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #334155; }
+        .event-lifespan span { color: #64748b; font-size: 0.75rem; }
 
-        .event-date {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #cbd5e1;
-            font-size: 0.875rem;
-            margin-bottom: 0.75rem;
-        }
+        .legend { margin-top: 1.25rem; padding: 1rem; background: #1e293b; border-radius: 0.75rem; border: 1px solid #334155; }
+        .legend h3 { color: white; font-weight: 600; margin-bottom: 0.75rem; text-align: center; }
+        .legend-items { display:flex; flex-wrap:wrap; justify-content:center; gap:1rem; }
+        .legend-item { display:flex; align-items:center; gap:0.5rem; }
+        .legend-icon { width:1.75rem; height:1.75rem; border-radius:9999px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; color:white; }
+        .legend-text { color:#cbd5e1; font-size:0.9rem; }
 
-        .event-description {
-            color: #94a3b8;
-            font-size: 0.875rem;
-        }
-
-        .event-lifespan {
-            margin-top: 0.75rem;
-            padding-top: 0.75rem;
-            border-top: 1px solid #334155;
-        }
-
-        .event-lifespan span {
-            color: #64748b;
-            font-size: 0.75rem;
-        }
-
-        .legend {
-            margin-top: 4rem;
-            padding: 1.5rem;
-            background: #1e293b;
-            border-radius: 1rem;
-            border: 1px solid #334155;
-        }
-
-        .legend h3 {
-            color: white;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .legend-items {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1.5rem;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .legend-icon {
-            width: 2rem;
-            height: 2rem;
-            border-radius: 9999px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-        }
-
-        .legend-text {
-            color: #cbd5e1;
-            font-size: 0.875rem;
-        }
-
-        .instructions {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            background: rgba(30, 58, 138, 0.3);
-            border: 1px solid #3b82f6;
-            border-radius: 0.75rem;
-        }
-
-        .instructions h3 {
-            color: white;
-            font-weight: bold;
-            margin-bottom: 0.75rem;
-        }
-
-        .instructions-content {
-            color: #bfdbfe;
-            font-size: 0.875rem;
-        }
-
-        .instructions-content p {
-            margin-bottom: 0.5rem;
-        }
-
-        .instructions-content ul {
-            margin-left: 1.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .instructions-content li {
-            margin-bottom: 0.25rem;
-        }
+        .instructions { margin-top: 1rem; padding: 1rem; background: rgba(30,58,138,0.12); border: 1px solid #3b82f6; border-radius: 0.75rem; }
+        .instructions h3 { color:white; font-weight:700; margin-bottom:0.5rem; }
+        .instructions-content { color:#bfdbfe; font-size:0.9rem; }
 
         /* Category colors */
         .cat-lifeline { background: #3b82f6; }
         .cat-wedding { background: #ec4899; }
         .cat-birthday { background: #a855f7; }
         .cat-cars { background: #10b981; }
+        .cat-houses { background: #f59e0b; }
 
         @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .event-card {
-                width: 100%;
-            }
-
+            .header h1 { font-size: 1.75rem; }
+            .timeline-line { left: 1rem; transform: none; }
+            .event-dot { left: 1rem; transform: none; }
+            .event-card { width: 100%; }
             .event:nth-child(even) .event-content,
-            .event:nth-child(odd) .event-content {
-                justify-content: center;
-            }
-
-            .timeline-line {
-                left: 1rem;
-            }
-
-            .event-dot {
-                left: 1rem;
-            }
+            .event:nth-child(odd) .event-content { justify-content: center; }
         }
     </style>
 </head>
@@ -338,17 +159,17 @@
     <div class="container">
         <div class="header">
             <h1>Family Timeline</h1>
-            <p>A journey through our cherished moments</p>
+            <p>A journey through our cherished moments — combined view for People, Houses & Cars</p>
         </div>
 
-        <div class="filters" id="filters"></div>
+        <div class="filters" id="filters" aria-label="Timeline filters"></div>
 
-        <div class="timeline-container">
-            <div class="timeline-line"></div>
+        <div class="timeline-container" id="timeline-container">
+            <div class="timeline-line" id="timeline-line"></div>
             <div class="timeline-events" id="timeline"></div>
         </div>
 
-        <div class="legend">
+        <div class="legend" aria-hidden="false">
             <h3>Event Categories</h3>
             <div class="legend-items" id="legend"></div>
         </div>
@@ -361,11 +182,11 @@
                     <li>startDate: Event date (YYYY-MM-DD format)</li>
                     <li>endDate: End date (use startDate for single events)</li>
                     <li>title: Event name</li>
-                    <li>category: Life Line, Wedding, Birthday, or Cars</li>
+                    <li>category: Life Line, Wedding, Birthday, Cars, or Houses</li>
                     <li>description: Optional details</li>
-                    <li>image: URL to photo</li>
+                    <li>image: URL to photo (or relative path in images/)</li>
                 </ul>
-                <p style="margin-top: 0.75rem;"><strong>Tips:</strong> Use public image URLs from Google Drive, Imgur, or similar services.</p>
+                <p style="margin-top: 0.5rem;"><strong>Notes:</strong> All events display in a single timeline. Use the filter buttons to show specific categories or "All" to show everything.</p>
             </div>
         </div>
     </div>
@@ -454,112 +275,82 @@
                 description: '',
                 image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=400'
             }
+            // Add houses events using category: 'Houses'
         ];
 
-        const categories = ['All', 'Life Line', 'Wedding', 'Birthday', 'Cars'];
-        
         const categoryConfig = {
-            'Life Line': { 
-                color: 'cat-lifeline', 
-                icon: '👥',
-                bgColor: '#3b82f6'
-            },
-            'Wedding': { 
-                color: 'cat-wedding', 
-                icon: '💕',
-                bgColor: '#ec4899'
-            },
-            'Birthday': { 
-                color: 'cat-birthday', 
-                icon: '🎂',
-                bgColor: '#a855f7'
-            },
-            'Cars': { 
-                color: 'cat-cars', 
-                icon: '🚗',
-                bgColor: '#10b981'
-            }
+            'Life Line': { color: 'cat-lifeline', icon: '👥', bgColor: '#3b82f6' },
+            'Wedding':   { color: 'cat-wedding', icon: '💕', bgColor: '#ec4899' },
+            'Birthday':  { color: 'cat-birthday', icon: '🎂', bgColor: '#a855f7' },
+            'Cars':      { color: 'cat-cars', icon: '🚗', bgColor: '#10b981' },
+            'Houses':    { color: 'cat-houses', icon: '🏠', bgColor: '#f59e0b' }
         };
+
+        const categories = ['All', ...Object.keys(categoryConfig)];
 
         let selectedCategory = 'All';
         let selectedEvent = null;
 
+        // Helpers
         function formatDate(dateStr) {
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric' 
-            });
+            const d = new Date(dateStr);
+            if (isNaN(d)) return dateStr;
+            return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
         }
 
         function getDateRange(start, end) {
-            if (start === end) return formatDate(start);
+            if (!end || start === end) return formatDate(start);
             return `${formatDate(start)} - ${formatDate(end)}`;
         }
 
         function calculateYears(start, end) {
-            const startDate = new Date(start);
-            const endDate = new Date(end);
-            return endDate.getFullYear() - startDate.getFullYear();
+            const s = new Date(start);
+            const e = new Date(end);
+            if (isNaN(s) || isNaN(e)) return '';
+            let years = e.getFullYear() - s.getFullYear();
+            const m = e.getMonth() - s.getMonth();
+            if (m < 0 || (m === 0 && e.getDate() < s.getDate())) years--;
+            return years;
         }
 
+        function getConfig(cat) {
+            return categoryConfig[cat] || { color: '', icon: '❓', bgColor: '#6b7280' };
+        }
+
+        // Renderers
         function renderFilters() {
-            const filtersEl = document.getElementById('filters');
-            filtersEl.innerHTML = categories.map(cat => `
-                <button class="filter-btn ${cat === selectedCategory ? 'active' : ''}" 
-                        onclick="filterCategory('${cat}')">
+            const el = document.getElementById('filters');
+            el.innerHTML = categories.map(cat => `
+                <button class="filter-btn ${cat === selectedCategory ? 'active' : ''}" onclick="filterCategory('${cat}')">
                     ${cat}
                 </button>
             `).join('');
         }
 
         function renderTimeline() {
-            const timelineEl = document.getElementById('timeline');
-            const filteredEvents = selectedCategory === 'All' 
-                ? events 
-                : events.filter(e => e.category === selectedCategory);
-            
-            const sortedEvents = [...filteredEvents].sort((a, b) => 
-                new Date(a.startDate) - new Date(b.startDate)
-            );
-
-            timelineEl.innerHTML = sortedEvents.map(event => {
-                const config = categoryConfig[event.category];
-                const isLifeLine = event.category === 'Life Line';
-                const years = isLifeLine ? calculateYears(event.startDate, event.endDate) : null;
-                const isSelected = event.id === selectedEvent;
-
+            const el = document.getElementById('timeline');
+            const filtered = selectedCategory === 'All' ? events : events.filter(e => e.category === selectedCategory);
+            const sorted = [...filtered].sort((a,b) => new Date(a.startDate) - new Date(b.startDate));
+            el.innerHTML = sorted.map(ev => {
+                const cfg = getConfig(ev.category);
+                const isLifeLine = ev.category === 'Life Line';
+                const years = isLifeLine ? calculateYears(ev.startDate, ev.endDate) : null;
+                const isSelected = ev.id === selectedEvent;
                 return `
                     <div class="event">
-                        <div class="event-dot ${config.color}">
-                            ${config.icon}
-                        </div>
+                        <div class="event-dot ${cfg.color}">${cfg.icon}</div>
                         <div class="event-content">
-                            <div class="event-card" onclick="selectEvent(${event.id})">
+                            <div class="event-card" onclick="selectEvent(${ev.id})" role="button" tabindex="0">
                                 <div class="card-inner ${isSelected ? 'selected' : ''}">
                                     <div class="event-image">
-                                        <img src="${event.image}" 
-                                             alt="${event.title}"
-                                             onerror="this.src='https://images.unsplash.com/photo-1464618663641-bbdd760ae84a?w=400'">
-                                        <div class="event-category-badge ${config.color}">
-                                            ${event.category}
-                                        </div>
+                                        <img src="${ev.image}" alt="${ev.title}" onerror="this.src='https://images.unsplash.com/photo-1464618663641-bbdd760ae84a?w=400'">
+                                        <div class="event-category-badge ${cfg.color}">${ev.category}</div>
                                     </div>
                                     <div class="event-details">
-                                        <h3 class="event-title">${event.title}</h3>
-                                        <div class="event-date">
-                                            📅
-                                            <span>${getDateRange(event.startDate, event.endDate)}</span>
-                                        </div>
-                                        ${event.description ? `
-                                            <p class="event-description">${event.description}</p>
-                                        ` : ''}
-                                        ${isLifeLine ? `
-                                            <div class="event-lifespan">
-                                                <span>${years} years</span>
-                                            </div>
-                                        ` : ''}
+                                        <h3 class="event-title">${ev.title}</h3>
+                                        <div class="event-date">📅 <span>${getDateRange(ev.startDate, ev.endDate)}</span></div>
+                                        ${ev.description ? `<p class="event-description">${ev.description}</p>` : ''}
+                                        ${isLifeLine ? `<div class="event-lifespan"><span>${years} years</span></div>` : ''}
                                     </div>
                                 </div>
                             </div>
@@ -570,34 +361,40 @@
         }
 
         function renderLegend() {
-            const legendEl = document.getElementById('legend');
-            legendEl.innerHTML = Object.entries(categoryConfig).map(([cat, config]) => `
+            const el = document.getElementById('legend');
+            el.innerHTML = Object.entries(categoryConfig).map(([cat, cfg]) => `
                 <div class="legend-item">
-                    <div class="legend-icon ${config.color}">
-                        ${config.icon}
-                    </div>
+                    <div class="legend-icon ${cfg.color}">${cfg.icon}</div>
                     <span class="legend-text">${cat}</span>
                 </div>
             `).join('');
         }
 
-        function filterCategory(category) {
-            selectedCategory = category;
+        // Handlers
+        function filterCategory(cat) {
+            selectedCategory = cat;
             selectedEvent = null;
             renderFilters();
             renderTimeline();
         }
 
-        function selectEvent(eventId) {
-            selectedEvent = selectedEvent === eventId ? null : eventId;
+        function selectEvent(id) {
+            selectedEvent = selectedEvent === id ? null : id;
             renderTimeline();
         }
 
-        // Initialize when page loads
-        window.addEventListener('DOMContentLoaded', function() {
+        // Init
+        window.addEventListener('DOMContentLoaded', () => {
             renderFilters();
             renderTimeline();
             renderLegend();
+        });
+
+        // Accessibility: keyboard Enter to activate focused cards
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && document.activeElement && document.activeElement.classList.contains('event-card')) {
+                document.activeElement.click();
+            }
         });
     </script>
 </body>
